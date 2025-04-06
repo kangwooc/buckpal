@@ -1,13 +1,40 @@
 package com.example.buckpal.account.domain;
 
-import org.springframework.cglib.core.Local;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Account {
-    private AccountId id;
-    private Money baselineBalance;
-    private ActivityWindow activityWindow;
+    /**
+     * The unique ID of the account.
+     */
+    private final AccountId id;
+    @Getter private final ActivityWindow activityWindow;
+    @Getter private final Money baselineBalance;
+
+    /**
+     * Creates an {@link Account} entity without an ID. Use to create a new entity that is not yet
+     * persisted.
+     */
+    public static Account withoutId(
+            Money baselineBalance,
+            ActivityWindow activityWindow) {
+        return new Account(null, baselineBalance, activityWindow);
+    }
+
+    /**
+     * Creates an {@link Account} entity with an ID. Use to reconstitute a persisted entity.
+     */
+    public static Account withId(
+            AccountId accountId,
+            Money baselineBalance,
+            ActivityWindow activityWindow) {
+        return new Account(accountId, baselineBalance, activityWindow);
+    }
 
     public Account(AccountId id, Money baselineBalance, ActivityWindow activityWindow) {
         this.id = id;
@@ -67,5 +94,10 @@ public class Account {
         );
         this.activityWindow.addActivity(deposit);
         return true;
+    }
+
+    @Value
+    public static class AccountId {
+        private Long value;
     }
 }
